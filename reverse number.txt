@@ -1,0 +1,17 @@
+def reverse_number(n, rev=0):
+    # Base case: if n becomes 0, return the reversed number
+    if n == 0:
+        return rev
+    else:
+        # Extract the last digit of the number
+        last_digit = n % 10
+        # Add the last digit to the reversed number (after shifting it left by one digit)
+        rev = rev * 10 + last_digit
+        # Recur with the remaining digits of the number
+        return reverse_number(n // 10, rev)
+
+# Example usage
+number = 12345
+reversed_number = reverse_number(number)
+print("Original number:", number)
+print("Reversed number:", reversed_number)

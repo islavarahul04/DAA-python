@@ -1,0 +1,58 @@
+import numpy as np
+
+class Node:
+    def __init__(self, level, path, cost, assigned):
+        self.level = level
+        self.path = path
+        self.cost = cost
+        self.assigned = assigned
+
+def bound(node, cost_matrix, n):
+    total_cost = node.cost
+    for i in range(node.level, n):
+        min_cost = float('inf')
+        for j in range(n):
+            if not node.assigned[j]:
+                min_cost = min(min_cost, cost_matrix[i][j])
+        total_cost += min_cost
+    return total_cost
+
+def assignment(cost_matrix):
+    n = len(cost_matrix)
+    initial_node = Node(level=0, path=[], cost=0, assigned=[False]*n)
+    min_cost = float('inf')
+    min_path = []
+
+    priority_queue = [initial_node]
+
+    while priority_queue:
+        node = priority_queue.pop(0)
+        if node.level == n:
+            if node.cost < min_cost:
+                min_cost = node.cost
+                min_path = node.path
+        else:
+            for j in range(n):
+                if not node.assigned[j]:
+                    child_assigned = node.assigned[:]
+                    child_assigned[j] = True
+                    child_path = node.path + [(node.level, j)]
+                    child_cost = node.cost + cost_matrix[node.level][j]
+                    bound_val = bound(node, cost_matrix, n)
+                    if bound_val < min_cost:
+                        child_node = Node(node.level + 1, child_path, child_cost, child_assigned)
+                        priority_queue.append(child_node)
+            priority_queue.sort(key=lambda x: x.cost)
+    return min_cost, min_path
+
+# Example usage
+cost_matrix = np.array([[4, 7, 6, 5],
+                        [2, 3, 1, 1],
+                        [5, 8, 7, 4],
+                        [3, 2, 4, 6]])
+
+min_cost, min_assignment = assignment(cost_matrix)
+print("Minimum Cost:", min_cost)
+print("Assignment:")
+for i, j in min_assignment:
+    print(f"Task {i+1} assigned to Agent {j+1}")
